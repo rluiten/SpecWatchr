@@ -718,7 +718,7 @@ class CommandShell
 end
 
 class WatcherDotNet
-  attr_accessor :notifier, :test_runner, :builder, :sh, :first_run
+  attr_accessor :notifier, :test_runner, :builder, :sh, :first_run, :config
   require 'find'
 
   EXCLUDES = [/\.dll$/, /debug/i, /TestResult.xml/, /testresults/i, /\.rb$/, /\.suo$/]
@@ -729,6 +729,7 @@ class WatcherDotNet
     @notifier = GrowlNotifier.new
     @builder = Kernel.const_get(config[:builder].to_s).new folder
     @test_runner = Kernel.const_get(config[:test_runner].to_s).new folder
+    @config = config
     @first_run = true
   end
 
