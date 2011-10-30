@@ -33,8 +33,8 @@ describe NSpecRunner do
     context "test file under a folder changed" do
       before(:each) { @changed_file = "./SomeProjectTests/describe_Person/when_saving_person.cs" }
 
-      it "should return the folder name including class name" do
-        @test_runner.find(@changed_file).should == 'describe_Person\.when_saving_person'
+      it "should just returns class name (nspec class filter was changed to use tagging)" do
+        @test_runner.find(@changed_file).should == 'when_saving_person'
       end
     end
 
