@@ -2,21 +2,24 @@
 <package> 
   <metadata> 
     <id>specwatchr</id> 
-    <version>1.5.9</version> 
+    <version>1.6.4</version> 
     <authors>Amir Rajan, Matt Florence</authors>
     <description>Set of ruby scripts that help you do continuous testing in .Net (supports NSpec, MSTest and NUnit).</description> 
     <language>en-US</language>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
     <projectUrl>http://nspec.org/continuoustesting</projectUrl>
     <tags>test testing autotest bdd</tags>
-    <iconUrl>http://nspec.org/themes/contoso/content/images/icon.png</iconUrl>
+    <iconUrl>http://nspec.org/images/specwatchr.png</iconUrl>
   </metadata>
   <files>
-    <file src="install.ps1" target="tools/install.ps1" />
-    <file src="watcher_dot_net.rb" target="src/watcher_dot_net.rb" />
-    <file src="dotnet.watchr.rb" target="src/dotnet.watchr.rb" />    
-    <file src="red.png" target="src/red.png" />    
-    <file src="green.png" target="src/green.png" />    
-    <file src="specwatchr-usage.txt" target="content/specwatchr-usage.txt" />
+    <file src="install.ps1" target="tools\install.ps1" />
+    <file src="watcher_dot_net.rb" target="src\watcher_dot_net.rb" />
+    <file src="dotnet.watchr.rb" target="src\dotnet.watchr.rb" />    
+    <file src="red.png" target="src\red.png" />    
+    <file src="green.png" target="src\green.png" />    
+    <file src="watchr.bat" target="src\watchr.bat" />    
+    <file src="sidekick.bat" target="src\sidekick.bat" />    
+    <file src="sidekickapp.cs" target="src\sidekickapp.cs" />    
+    <file src="specwatchr-usage.txt" target="content\specwatchr-usage.txt" />
   </files>
 </package>

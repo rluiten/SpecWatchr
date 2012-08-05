@@ -78,19 +78,5 @@ describe WatcherDotNet do
         end
 
       end
-
-      it "should growl configuration if first run" do
-        @notifier.should_receive(:execute).with("specwatchr", "builder: #{@watcher.builder.class}\ntest runner: #{@watcher.test_runner.class}\nconfig file: dotnet.watchr.rb", "green")
-
-        @watcher.first_run = true
-
-        @watcher.consider "Person.cs"
-      end
-
-      it "should set first_run to false after growling" do
-        @watcher.first_run = true
-        @watcher.consider "Person.cs"
-        @watcher.first_run.should == false
-      end
   end
 end
