@@ -23,7 +23,15 @@ class GrowlNotifier
 
     opts << "/i:\"#{File.expand_path("#{color}.png")}\"" 
 
-    `#{opts.join ' '}`
+    puts title
+    puts text
+
+    begin
+      `#{opts.join ' '}`
+    rescue
+      puts "doesn't look like Growl for Windows is installed at:" 
+      puts GrowlNotifier.growl_path
+    end
   end
 end
 
