@@ -3,7 +3,14 @@ require "./watcher_dot_net.rb"
 describe NSpecRunner do
   before(:each) do
     @test_runner = NSpecRunner.new "." 
+    stub_stack_trace_output
     $stdout.stub!(:puts) { }
+  end
+
+  def stub_stack_trace_output
+    @test_runner.stub!(:write_stack_trace) do |output|
+      @written_stack_trace = output
+    end
   end
 
   describe "when executing tests" do
@@ -12,6 +19,7 @@ describe NSpecRunner do
       CommandShell.stub!(:new).and_return(@sh)
       @sh.stub!(:execute).and_return("")
       @test_runner = NSpecRunner.new "."
+      stub_stack_trace_output
     end
 
     it "should execute tests against each dll" do
@@ -29,7 +37,8 @@ describe NSpecRunner do
       @sh = mock("CommandShell")
       CommandShell.stub!(:new).and_return(@sh)
       @test_runner = NSpecRunner.new "."
-      @sh.stub!(:execute).and_return""
+      stub_stack_trace_output
+      @sh.stub!(:execute).and_return ""
       @test_runner.stub!(:test_dlls).and_return(["./test1.dll"])
     end
 
@@ -62,6 +71,7 @@ describe NSpecRunner do
       @sh = mock("CommandShell")
       CommandShell.stub!(:new).and_return(@sh)
       @test_runner = NSpecRunner.new "."
+      stub_stack_trace_output
       @sh.stub!(:execute).and_return""
       @test_runner.stub!(:test_dlls).and_return(["./test1.dll"])
     end

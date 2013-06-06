@@ -1,0 +1,10 @@
+nspec.  borrowed games.  games controller. wanted games. wanting game. marks the game as requested.
+'BorrowedGames.Models.User' does not contain a definition for 'Wantss'
+    at BorrowedGames.Models.User.GameIsWanted(Object game) in Sample\BorrowedGames\Models\User.cs:line 152
+
+nspec.  borrowed games.  games controller. wanted games. deleting wanted game. other requests are unchanged.
+'BorrowedGames.Models.User' does not contain a definition for 'Wantss'
+    at BorrowedGames.Models.User.GameIsWanted(Object game) in Sample\BorrowedGames\Models\User.cs:line 152
+nspec.  borrowed games.  games controller. wanted games. deleting wanted game. is no longer requested.
+'BorrowedGames.Models.User' does not contain a definition for 'Wantss'
+   at BorrowedGames.Models.User.GameIsWanted(Object game) in Sample\BorrowedGames\Models\User.cs:line 152

@@ -3,6 +3,9 @@ require "./watcher_dot_net.rb"
 describe NSpecRunner do
   before(:each) do
     @test_runner = NSpecRunner.new "." 
+    @test_runner.stub!(:write_stack_trace) do |output|
+      @written_output = output
+    end
     $stdout.stub!(:puts) { }
     @changed_file = "./SomeProjectTests/when_saving_person.cs" 
     @dll = ["./SomeProjectTests/bin/Debug/SomeProjTest.dll"]
