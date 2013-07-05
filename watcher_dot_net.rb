@@ -806,7 +806,9 @@ class WatcherDotNet
     build_output = @builder.execute
     puts build_output
     
-    @notifier.execute "build failed", build_output, 'red' if @builder.failed
+    if !build_output =~ /another process/ #supress build failures associated with pdb files
+      @notifier.execute "build failed", build_output, 'red' if @builder.failed
+    end
 
     if @builder.failed
       puts "===================== done consider ========================"
