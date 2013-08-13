@@ -11,7 +11,7 @@ namespace SyncDeploy
     {
         static string path = null; 
         static FileSystemWatcher watcher;
-
+		static string[] fileExtensionsWhiteList = new string[] { ".cs", ".coffee", ".rb", ".html", ".cshtml", ".js", ".css", ".fs" };
         static void Main(string[] args)
         {
             path = Directory.GetCurrentDirectory();
@@ -62,7 +62,7 @@ namespace SyncDeploy
 
         static void CallWatcher(string path)
         {
-            if(System.IO.File.Exists(path))
+            if (fileExtensionsWhiteList.Contains(Path.GetExtension(path)) && System.IO.File.Exists(path))
             {
                 watcher.EnableRaisingEvents = false;
                 var relativeFile = path.Replace(Directory.GetCurrentDirectory(), "");
