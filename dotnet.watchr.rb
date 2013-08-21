@@ -86,6 +86,21 @@ MSTestRunner.ms_test_path =
   'C:\program files (x86)\microsoft visual studio 10.0\common7\ide\mstest.exe'
 
 =begin
+ _______  _______  _______  _______  _______ 
+(       )(  ____ \(  ____ )(  ____ \(  ____ \
+| () () || (    \/| (    )|| (    \/| (    \/
+| || || || (_____ | (____)|| (__    | |      
+| |(_)| |(_____  )|  _____)|  __)   | |      
+| |   | |      ) || (      | (      | |      
+| )   ( |/\____) || )      | (____/\| (____/\
+|/     \|\_______)|/       (_______/(_______/
+if you choose :MSPECTestRunner as your :test_runner
+this is the execution path for mspec-clr4.exe
+=end
+MSPECTestRunner.mspec_path = 
+  'packages\Machine.Specifications.0.5.15\tools\mspec-clr4.exe'
+
+=begin
  _                 _       __________________
 ( (    /||\     /|( (    /|\__   __/\__   __/
 |  \  ( || )   ( ||  \  ( |   ) (      ) (   

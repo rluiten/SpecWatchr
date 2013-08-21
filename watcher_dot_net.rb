@@ -745,6 +745,210 @@ OUTPUT
   
 end
 
+class MSPECTestRunner < TestRunner
+  attr_accessor :failed, :inconclusive, :test_results
+  
+  def initialize folder
+    super folder
+    @sh = CommandShell.new
+    @failed_tests = Array.new
+    @status_by_dll = Hash.new
+    @@mspec_path = ".\\packages\\Machine.Specifications.0.5.15\\tools\\mspec-clr4.exe"
+  end
+
+  def self.mspec_path
+     @@mspec_path
+  end
+
+  def self.mspec_path= value
+    @@mspec_path = value
+  end
+  
+  def usage
+    <<-OUTPUT
+MSPECTestRunner will use the following exe to run your tests: 
+#{MSPECTestRunner.mspec_path}
+
+MSPECTestRunner for SpecWatchr uses a convention based approach for running unit tests.  Let's say you have a class called Person (located in file Person.cs).  You'll need to create a test class called describe_Person.cs (all tests associated with Person.cs should go under describe_Person.cs).  Once the test class is created, change the namespace of the class to include PersonSpec.  For example:
+
+//here is the person class (located in Person.cs)
+public class Person 
+{
+    public string FirstName { get; set; }
+}
+
+//here is the test class (located in describe_Person.cs)...notice the namespace
+namespace YourUnitTests.describe_Person
+{
+    public class when_initializing_person
+    {
+        Establish context = () =>{
+        };
+
+        Because of = () =>{
+          Person person = new Person();
+        };
+
+        It should = () =>{
+          person.FirstName.ShouldBeEmpty();
+        };
+    }
+}
+
+Whenever you save Person.cs, all tests under the namespace describe_Person will get executed.
+OUTPUT
+  end
+
+  def failed_tests
+    @failed_tests
+  end
+
+  def status_by_dll
+    @status_by_dll
+  end
+
+  def passed_tests
+    @passed_tests
+  end
+
+  def test_config
+    Find.find(@folder) do |f| 
+      return f.gsub("./", "") if /Local.testsettings$/.match(f) != nil || /LocalTestRun.testrunconfig$/.match(f) != nil
+    end
+  end
+
+  def set_test_status test_dll, test_output
+    results = Hash.new
+    results[:failed] = false
+    results[:inconclusive] = false
+
+    test_output.each_line do |output| 
+      results[:failed] = true if [/\((FAIL)\)/].any? { |pattern| output.match(pattern) }
+      results[:inconclusive] = true if output.match(/No tests to execute/)
+    end
+
+    @status_by_dll[test_dll] = results
+  end
+
+  def parse_test_result test_dll, test_output, test_name
+    last_test_item = nil
+    in_error = false
+    start_parsing_results = false
+    specification_name = ""
+    test_output.split("\n").each do |line|
+      stripped_line = line
+        if(line.match(/Failures:/))
+          start_parsing_results = true
+          next
+        end
+        if(line.empty?)
+          in_error = false
+          specification_name = ""
+          next
+        end
+        if(in_error)
+          last_test_item[:errormessage] += stripped_line + "\n" if last_test_item[:errormessage]
+        
+        elsif(specification_name.empty? and not line.match(/Contexts/i))
+          specification_name = stripped_line
+        elsif(line.match(/\((FAIL)\)/))
+          in_error = true
+          last_test_item = { :name => "#{specification_name}" + "\n" + stripped_line.gsub("(FAIL)", ""), :dll => test_dll }
+          last_test_item[:errormessage] = ""
+          @failed_tests << last_test_item
+        elsif(line.match(/Contexts/i))
+          in_error = false
+          number_of_specifications = stripped_line.match(/.Specifications:../)[0]
+          number_of_specifications = number_of_specifications.gsub("Specifications:", "").squeeze(' ')
+          last_test_item = { :name => number_of_specifications, :dll => test_dll }
+          @passed_tests << last_test_item
+        end
+    end
+
+    @failed_tests.sort! { |a, b| a[:spec] <=> b[:spec] }
+    @passed_tests.sort! { |a, b| a[:spec] <=> b[:spec] }
+  end
+
+  def set_test_result_output test_dll, test_name
+    tests = Array.new
+    failed = @status_by_dll[test_dll][:failed]
+    inconclusive = @status_by_dll[test_dll][:inconclusive]
+    passed = !failed && !inconclusive
+
+    if(failed)
+      test_output = "Failed Tests:\n"
+      tests = @failed_tests.select { |kvp| kvp[:dll] == test_dll }
+    elsif(passed)
+      return if @failed
+      test_output = "All Passed:\n"
+      tests = @passed_tests.select { |kvp| kvp[:dll] == test_dll }
+    else
+      test_output = "Test Inconclusive:\nNo tests found under #{ test_name }\n"
+    end
+    
+    current_spec = ""
+
+    first_test = true
+
+    tests.each do |line|
+      test_output += "\n" unless first_test
+      first_test = false
+      test_output += line[:name] + "\n"
+      test_output += line[:errormessage].strip + "\n" if line[:errormessage] and line[:errormessage].length > 0
+
+      if(failed && @first_failed_test == nil && line[:errormessage])
+        @first_failed_test = test_output
+      end
+    end
+
+    @test_results += test_output + "\n"
+  end
+
+  def execute test_name
+    @test_results = ""
+    @failed_tests = Array.new
+    @passed_tests = Array.new
+    @status_by_dll.clear
+    @first_failed_test = nil
+    test_dlls.each do |test_dll|
+      test_output = @sh.execute "#{test_cmd(test_dll, test_name.gsub(/describe_/, ""))}"
+  
+      set_test_status test_dll, test_output
+      puts 'Test Name : ' + test_name
+      parse_test_result test_dll, test_output, test_name
+    end
+
+    @inconclusive = true
+    @failed = false
+
+    @status_by_dll.each_value do |value|
+      @inconclusive = @inconclusive && value[:inconclusive]
+      @failed = @failed || value[:failed]
+    end
+
+    test_dlls.each do |test_dll|
+      set_test_result_output test_dll, test_name
+    end
+
+    if(!@inconclusive && !@failed)
+      @test_results += "#{@passed_tests[0][:name]} tests ran and passed\n"
+    end
+
+    @test_results
+  end
+  
+  def test_cmd test_dll, test_name
+    if test_name
+      #return "\"#{MSPECTestRunner.mspec_path}\" #{test_dll} -i #{test_name}"
+      #currently not working as intended
+      return "\"#{MSPECTestRunner.mspec_path}\" #{test_dll}"
+    else
+      return "\"#{MSPECTestRunner.mspec_path}\" #{test_dll}"
+    end
+  end 
+  
+end
+
 class CommandShell
   def execute cmd
     puts cmd + "\n\n"
