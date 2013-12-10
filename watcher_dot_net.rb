@@ -71,7 +71,7 @@ class MSBuilder
   end
 
   def build_cmd file
-    "\"#{MSBuilder.ms_build_path}\" \"#{file}\" /verbosity:quiet /nologo"
+    "\"#{MSBuilder.ms_build_path}\" \"#{file}\" /verbosity:quiet /nologo /p:Platform=\"Any CPU\""
   end
 
   def self.ms_build_path
