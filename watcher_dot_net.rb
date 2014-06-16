@@ -221,11 +221,12 @@ class NSpecRunner < TestRunner
   end
 
   def contained_in_test_project file
+    found = false
     test_dlls.each do |dll|
-      return root_folder(dll) == root_folder(file)
+      found = true if root_folder(dll) == root_folder(file)
     end
 
-    false
+    found
   end
 
   def self.nspec_path
