@@ -39,6 +39,15 @@ describe WatcherDotNet do
         end
       end
 
+      context "two test dlls" do
+        before(:each) { @test_runner.stub!(:test_dlls).and_return(["test1.dll","test2.dll"]) }
+        
+        it "should say that both dlls are in the test project" do
+          @test_runner.contained_in_test_project("test1.sll").should be_true
+          @test_runner.contained_in_test_project("test2.sll").should be_true
+        end
+      end
+
       context "sln directory and csproj directory at same level" do
         before(:each) { Dir.stub!(:entries).with(".").and_return(["SomeProject.sln", "SomeProject.csproj"]) }
 
