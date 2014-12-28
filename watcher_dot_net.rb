@@ -201,7 +201,13 @@ class NSpecRunner < TestRunner
   def test_dlls
     return  @test_dlls_override if !@test_dlls_override.nil?
 
-    Dir['**/*NSpec.dll'].select {|f| !f.downcase.include?('packages')}.map {|f| f.gsub(/([^\/]*)\/bin\/Debug\/.*/, '\1/bin/Debug/\1.dll')}
+  	raw = Dir['**/*Spec.dll']
+    result = raw
+		.select {|f| !f.downcase.include?('packages') }
+		.select {|f| !f.downcase.include?('/obj/') }
+		.select {|f| !f.include?('/NSpec.dll') }
+		.map {|f| f.gsub(/([^\/]*)\/bin\/Debug\/.*/, '\1/bin/Debug/\1.dll')}
+	result
   end
 
   def find file
